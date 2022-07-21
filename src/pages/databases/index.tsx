@@ -205,7 +205,7 @@ const Home: NextPage = () => {
                                 ) as string
                               )
                               .then(() => {
-                                toast("info", "Copied to clipboard", onSubmit);
+                                toast("info", "Copied to clipboard");
                               });
                           }}
                         >

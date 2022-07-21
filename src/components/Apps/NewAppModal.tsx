@@ -2,16 +2,16 @@ import { trpc } from "../../utils/trpc";
 import Head from "next/head";
 import React, { createRef, Fragment, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import {
-  newServiceInput,
-  newServiceInputObject,
-} from "../../server/router/swarmpit";
+import { newServiceInput } from "../../server/router/swarmpit";
 import { randomString } from "../../utils/helpers";
+import { useToast } from "../../utils/hooks";
 import { RefreshIcon, BeakerIcon } from "@heroicons/react/solid";
 
 import classes from "./NewAppModal.module.css";
 
 const ModalOverlay = (props: any) => {
+  const toast = useToast(4000);
+  // First page - Application details
   const serviceRepository = createRef<any>();
   const servicePort = createRef<any>();
   const serviceName = createRef<any>();
@@ -19,10 +19,29 @@ const ModalOverlay = (props: any) => {
   const repositories = trpc.useQuery(["github.get-repositories"]);
   const [currentStep, setCurrentStep] = useState<number>(1);
 
+  // Second page - Database attachment
+  const availableDatases = trpc.useQuery(["databases.get-user-databases"]);
+  const selectedDatabase = createRef<any>();
+  const [databaseUpdateChange, setDatabaseUpdateChange] = useState(true);
+  const createNewClientDatabase = trpc.useMutation([
+    "databases.create-user-database",
+  ]);
+
   useEffect(() => {
-    serviceName.current.value = randomString(12);
-    servicePort.current.value = "3000";
+    if (serviceName && serviceName.current) {
+      serviceName.current.value = randomString(12);
+      servicePort.current.value = "3000";
+    }
   }, []);
+
+  const createNewDatabaseFunction = async (data: {}) => {
+    setDatabaseUpdateChange(false);
+    await createNewClientDatabase.mutateAsync({
+      hostId: "cl5ppx66s0029nccrad5nkg4o",
+    });
+    toast("success", "Database created");
+    setDatabaseUpdateChange(true);
+  };
 
   const sendInputUp = () => {
     const sendData = {
@@ -131,6 +150,37 @@ const ModalOverlay = (props: any) => {
                 >
                   Next
                 </button>
+              </>
+            )}
+            {currentStep === 2 && (
+              <>
+                <label className="input-group flex w-full">
+                  <span className="w-full justify-center pt-2 pb-2 font-semibold">
+                    Select Existing Database
+                  </span>
+                </label>
+                <label className="input-group flex w-full">
+                  <span className="w-32">Database</span>
+                  <select
+                    className="select select-bordered w-fit justify-end"
+                    ref={selectedDatabase}
+                  >
+                    {availableDatases.data?.map((database) => (
+                      <option key={database.id} value={database.id}>
+                        {database.clientDatabaseName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="divider">OR</div>
+                <label className="input-group flex w-full  justify-center">
+                  <label
+                    className="btn btn-primary"
+                    onClick={createNewDatabaseFunction}
+                  >
+                    Create New Database
+                  </label>
+                </label>
               </>
             )}
           </p>
