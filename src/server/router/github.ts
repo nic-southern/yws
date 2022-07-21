@@ -25,7 +25,9 @@ export const githubRouter = createRouter().query("get-repositories", {
         provider: "github",
       },
     });
-    const gitClient: any = githubClient(userToken?.access_token as string);
+    const gitClient: typeof axios = githubClient(
+      userToken?.access_token as string
+    );
     const response = await gitClient.get("/user/repos");
     return response.data as githubRepoType[];
   },

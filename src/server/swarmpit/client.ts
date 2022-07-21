@@ -5,7 +5,7 @@ import { z } from "zod";
 // Exports an axios client for github requests..
 export const swarmpitClient = () => {
   const client = axios.create({
-    baseURL: "https://swarmpit.nsouthern.com",
+    baseURL: process.env.SWARMPIT_URL as string,
     headers: {
       Authorization: process.env.SWARMPIT_TOKEN as string,
     },
