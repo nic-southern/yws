@@ -85,7 +85,7 @@ const DeleteModal = (database: any, onConfirm: any) => {
 };
 
 const Home: NextPage = () => {
-  const userDatabases = trpc.useQuery(["databases.getUserDatabases"]);
+  const userDatabases = trpc.useQuery(["databases.get-user-databases"]);
   const [selectedClient, setSelectedClient] = useState("Prisma");
   const [databaseUpdateChange, setDatabaseUpdateChange] = useState(true);
   const clientSelectedValue = useRef("");
@@ -96,10 +96,10 @@ const Home: NextPage = () => {
   const toast = useToast(4000);
 
   const createNewClientDatabase = trpc.useMutation([
-    "postgresHostDatabase.create-new-database",
+    "databases.create-user-database",
   ]);
   const deleteClientDatabase = trpc.useMutation([
-    "postgresHostDatabase.delete-user-database",
+    "databases.delete-user-database",
   ]);
   const createNewDatabaseFunction = async (data: {}) => {
     setDatabaseUpdateChange(false);
