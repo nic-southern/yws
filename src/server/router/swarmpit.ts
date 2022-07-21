@@ -23,7 +23,7 @@ export type newServiceInput = z.infer<typeof newServiceInputObject>;
 
 const nextJSDefaults = {
   repository: {
-    name: "jeronica/nextjs-with-turbo",
+    name: process.env.NEXTJS_DEPLOY_DOCKER_IMAGE as string,
     tag: "latest",
   },
   hosts: [],
@@ -154,7 +154,10 @@ export const swarmpitRouter = createRouter()
       }
 
       const appUrl = name + ".dev.nsouthern.com";
-      const httpRepository = repository.replace("git://", "https://");
+      const httpRepository = repository.replace(
+        "git://",
+        "https://" + userToken.access_token + "@"
+      );
 
       const service: newServiceObject = {
         ...nextJSDefaults,
