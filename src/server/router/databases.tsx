@@ -35,16 +35,24 @@ export const databasesRouter = createRouter()
   })
   .mutation("create-user-database", {
     // using zod schema to validate and infer input values
-    input: z.object({
-      hostId: z.string(),
-    }),
+    input: z
+      .object({
+        hostId: z.string().nullish(),
+      })
+      .nullish(),
     async resolve({ input, ctx }) {
+      let hostDatabase: any;
       // Here some login stuff would happen
-      const hostDatabase = await ctx.prisma.databaseHost.findFirst({
-        where: {
-          id: input.hostId,
-        },
-      });
+      if (!input || !input?.hostId) {
+        hostDatabase = await ctx.prisma.databaseHost.findFirst();
+      } else {
+        hostDatabase = await ctx.prisma.databaseHost.findFirst({
+          where: {
+            id: input.hostId,
+          },
+        });
+      }
+
       if (!hostDatabase) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -104,7 +112,7 @@ export const databasesRouter = createRouter()
         });
       }
       // Return the new client database
-      return "Created!";
+      return clientDatabase;
     },
   })
   .mutation("delete-user-database", {
@@ -155,7 +163,6 @@ export const databasesRouter = createRouter()
           id: input.databaseId,
         },
       });
-      console.log("finished");
       return "Deleted!";
     },
   });

@@ -187,7 +187,7 @@ const newServiceObject = z.object({
 
 const newNewServiceObject = z.object({
   labels: z.array(
-    z.object({ name: z.string(), value: z.string(), key: z.string() })
+    z.object({ name: z.string(), value: z.string(), key: z.string().nullish() })
   ),
   repository: z.object({ name: z.string(), tag: z.string() }),
   hosts: z.array(z.unknown()),
@@ -206,7 +206,7 @@ const newNewServiceObject = z.object({
   secrets: z.array(z.unknown()),
   mode: z.string(),
   variables: z.array(
-    z.object({ name: z.string(), value: z.string(), key: z.string() })
+    z.object({ name: z.string(), value: z.string(), key: z.string().nullish() })
   ),
   networks: z.array(z.object({ networkName: z.string() })),
   ports: z.array(z.unknown()),

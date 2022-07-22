@@ -18,6 +18,7 @@ export const newServiceInputObject = z.object({
   name: z.string(),
   branch: z.string(),
   servicePort: z.number(),
+  database: z.string().nullish(),
 });
 export type newServiceInput = z.infer<typeof newServiceInputObject>;
 
@@ -152,6 +153,47 @@ export const swarmpitRouter = createRouter()
       if (!userToken) {
         return;
       }
+      const variableObject = z
+        .array(
+          z.object({
+            name: z.string(),
+            value: z.string(),
+            key: z.string().nullish(),
+          })
+        )
+        .nullable();
+      type variableObject = z.infer<typeof variableObject>;
+
+      let addedVariables: variableObject = [];
+
+      if (input.database) {
+        const db = await ctx.prisma.userDatabase.findFirst({
+          where: {
+            id: input.database,
+          },
+          include: {
+            databaseHost: true,
+          },
+        });
+        if (db) {
+          addedVariables = [
+            ...addedVariables,
+            {
+              name: "DATABASE_URL",
+              value:
+                `DATABASE_URL=postgres://` +
+                db.clientUsername +
+                `:` +
+                db.clientPassword +
+                `@` +
+                db.databaseHost.hostname +
+                `/` +
+                db.clientDatabaseName +
+                `?sslaccept=strict`,
+            },
+          ];
+        }
+      }
 
       const appUrl = name + ".dev.nsouthern.com";
       const httpRepository = repository.replace(
@@ -165,84 +207,69 @@ export const swarmpitRouter = createRouter()
           {
             name: "traefik.http.routers." + name + "-https.tls.certresolver",
             value: "le",
-            key: "a33295b9-29c2-4029-84ee-eab73c0389d5",
           },
           {
             name: "traefik.http.routers." + name + "-https.entrypoints",
             value: "https",
-            key: "80ee8406-33b5-4929-bd90-b84ae383eebe",
           },
           {
             name: "traefik.http.routers." + name + "-http.rule",
             value: "Host(`" + appUrl + "`)",
-            key: "3ace2a01-662c-4992-8efa-0dccd6a3ad7b",
           },
           {
             name: "traefik.http.routers." + name + "-http.middlewares",
             value: "https-redirect",
-            key: "a9da756e-a0d4-440f-a28e-9877ac874ce4",
           },
           {
             name: "traefik.constraint-label",
             value: "traefik-public",
-            key: "f4e20170-9238-43bf-ae8d-0677d357920b",
           },
           {
             name: "traefik.http.routers." + name + "-https.rule",
             value: "Host(`" + appUrl + "`)",
-            key: "80eba456-a7d4-4dd2-9e57-41ee61084f47",
           },
           {
             name: "traefik.docker.network",
             value: "traefik-public",
-            key: "1d2ecd04-55ed-4b6f-97e2-5a9d9820aa78",
           },
           {
             name: "traefik.enable",
             value: "true",
-            key: "5d7637de-8ffa-48fd-aa77-268e6ad2fc72",
           },
           {
             name: "traefik.http.routers." + name + "-https.tls",
             value: "true",
-            key: "c836ef11-a380-45d4-9989-1fbdca675158",
           },
           {
             name: "traefik.http.routers." + name + "-http.entrypoints",
             value: "http",
-            key: "ba252b4d-b926-45b3-aa1d-ac8f3ccf13ea",
           },
           {
             name: "traefik.http.services." + name + ".loadbalancer.server.port",
             value: "3000",
-            key: "b76e4e3d-9c8c-4c6b-aa07-9eca74a61d98",
           },
         ],
         variables: [
+          ...addedVariables,
           {
             name: "PROJECT_REPOSITORY_URL",
             value: httpRepository,
-            key: "65495ff5-629c-4a54-b98f-c5ce93b35d20",
           },
           {
             name: "PROJECT_BRANCH",
             value: branch,
-            key: "1197c278-d761-4be0-bd1e-3b990baeb635",
           },
           {
             name: "GITHUB_TOKEN",
             value: userToken.access_token as string,
-            key: "3330b3d4-8ebf-4638-b1de-453e3ae2f06b",
           },
           {
             name: "NEXTAUTH_SECRET",
             value: randomString(32),
-            key: "2a09a963-ca07-417a-bf72-30f9df7664ed",
           },
           {
             name: "NEXTAUTH_URL",
             value: appUrl,
-            key: "d4c3aa4f-cb97-4c37-b28d-ae018569f681",
           },
         ],
 
@@ -254,5 +281,7 @@ export const swarmpitRouter = createRouter()
         .catch((err: any) => {
           console.log(err);
         });
+      console.log(response.data);
+      return response.data;
     },
   });

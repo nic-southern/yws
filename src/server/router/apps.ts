@@ -3,6 +3,9 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ErrorCode } from "../../utils/auth";
 import { newServiceInputObject } from "./swarmpit";
+import * as trpc from "@trpc/server";
+import { appRouter } from ".";
+import { swarmpitRouter } from "./swarmpit";
 
 export const appsRouter = createRouter()
   .query("get-user-apps", {
@@ -37,6 +40,11 @@ export const appsRouter = createRouter()
         });
       }
 
+      const swarmpitCaller = swarmpitRouter.createCaller(ctx);
+      const swarmpitResponse = await swarmpitCaller.mutation(
+        "create-new-service",
+        input
+      );
       await ctx.prisma.userApp.create({
         data: {
           appType: "nextjs",
@@ -45,6 +53,8 @@ export const appsRouter = createRouter()
           appBranch: input.branch,
           servicePort: input.servicePort,
           userId: ctx.session.id as string,
+          connectedDatabaseId: input.database as string,
+          serviceName: swarmpitResponse.id,
         },
       });
     },
