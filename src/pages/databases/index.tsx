@@ -6,7 +6,7 @@ import FluidLayout from "../../components/UI/FluidLayout";
 import { Prisma } from "@prisma/client";
 import { useToast } from "../../utils/hooks";
 import { XIcon } from "@heroicons/react/solid";
-
+/* eslint-disable react-hooks/exhaustive-deps */
 const clientStrings = [
   { value: "Prisma", label: "Prisma" },
   { value: "Laravel", label: "Laravel" },
@@ -216,19 +216,23 @@ const Home: NextPage = () => {
                     <div className="input input-bordered  w-full max-w-xs overflow-hidden text-clip pl-1 pr-1">
                       {selectedClient === "Postgres" && (
                         <code>
-                          DATABASE_URL="postgres://user:******@server.net/database?sslaccept=strict"
+                          {`
+                            (DATABASE_URL =
+                              "postgres://user:******@server.net/database?sslaccept=strict")
+                          `}
                         </code>
                       )}
                       {selectedClient === "Prisma" && (
                         <code>
-                          DATABASE_URL="postgres://{database.clientUsername}
+                          {`DATABASE_URL="postgres://${database.clientUsername}
                           :******@
-                          {database.databaseHost.hostname}/
-                          {database.clientDatabaseName}?sslaccept=strict"
+                          ${database.databaseHost.hostname}/
+                          ${database.clientDatabaseName}?sslaccept=strict"`}
                         </code>
                       )}
                       {selectedClient === "Laravel" && (
                         <>
+                          {`
                           DB_CONNECTION=mysql
                           {/* prettier-ignore */}
                           DB_DATABASE=cooldog
@@ -244,10 +248,12 @@ const Home: NextPage = () => {
                           <br />
                           {/* prettier-ignore */}
                           DB_PORT=3306
+                          `}
                         </>
                       )}
                       {selectedClient === "Django" && (
                         <>
+                          {`
                           {/* prettier-ignore */}
                           DB_DATABASE=cooldog
                           <br />
@@ -262,6 +268,7 @@ const Home: NextPage = () => {
                           <br />
                           {/* prettier-ignore */}
                           DB_PORT=5432
+                          `}
                         </>
                       )}
                     </div>

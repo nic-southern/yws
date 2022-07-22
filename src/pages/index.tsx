@@ -31,9 +31,9 @@ const Home: NextPage = () => {
             <div className="card-body items-center text-center">
               <h2 className="card-title">Welcome!</h2>
               <p>
-                Don't you wish the Yeti hosted all your databases and
+                {`Don't you wish the Yeti hosted all your databases and
                 containerized apps? Now you can deploy your React projects with
-                Postgres in one dashboard.
+                Postgres in one dashboard.`}
               </p>
               <div className="card-actions justify-end">
                 <button className="btn btn-primary">Very Cool</button>

@@ -7,7 +7,7 @@ import { Prisma } from "@prisma/client";
 import NewAppModal from "../../components/Apps/NewAppModal";
 import { useToast } from "../../utils/hooks";
 import { XIcon } from "@heroicons/react/solid";
-
+/* eslint-disable react-hooks/exhaustive-deps */
 const DeleteModal = (userApp: any, onConfirm: any) => {
   const confirmRef = createRef<HTMLInputElement>();
   const toggleref = createRef<HTMLLabelElement>();

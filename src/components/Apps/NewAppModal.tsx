@@ -13,6 +13,8 @@ import { useForm, Resolver } from "react-hook-form";
 
 import classes from "./NewAppModal.module.css";
 
+/* eslint-disable react-hooks/exhaustive-deps */
+
 type NewAppFormValues = {
   name: string;
   branch: string;
@@ -38,13 +40,6 @@ const resolver: Resolver<NewAppFormValues> = async (values) => {
 
 const ModalOverlay = (props: any) => {
   const toast = useToast(400);
-  const formInput = {
-    name: "",
-    branch: "",
-    repository: "",
-    servicePort: "",
-    database: "",
-  };
   const {
     register,
     handleSubmit,
@@ -98,7 +93,10 @@ const ModalOverlay = (props: any) => {
     setValue("database", newdatabase.id);
   };
 
-  const onSubmit = handleSubmit((data) => props.createNewService(data));
+  const onSubmit = handleSubmit((data) => {
+    data.servicePort = Number(data.servicePort);
+    props.createNewService(data);
+  });
 
   return (
     <Fragment>

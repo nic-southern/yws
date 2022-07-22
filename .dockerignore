@@ -1,0 +1,14 @@
+passphrase.txt
+logs/
+.git
+*.md
+.cache
+node_modules
+.next
+.swc
+.env
+.env.local
+Dockerfile
+Dockerfile.prod
+.dockerignore
+build
